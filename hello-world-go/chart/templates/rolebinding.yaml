@@ -1,0 +1,13 @@
+{{- if .Values.roleBinding.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.roleBinding.name }}
+  namespace: {{ .Values.roleBinding.namespace }}
+subjects:
+{{ toYaml .Values.roleBinding.subjects | indent 2 }}
+roleRef:
+  kind: {{ .Values.roleBinding.roleRef.kind }}
+  name: {{ .Values.roleBinding.roleRef.name }}
+  apiGroup: {{ .Values.roleBinding.roleRef.apiGroup }}
+{{- end }}

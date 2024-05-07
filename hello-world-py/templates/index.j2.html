@@ -1,0 +1,64 @@
+<head>
+    <title>Hello World</title>
+    <style>
+        body {
+            background-color: white;
+            text-align: center;
+            padding: 50px;
+            font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        button {
+            background-color: #0075a8;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+        }
+
+        #logo {
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+<img id="logo" src="../static/img/logo.png" alt="logo" width=400/>
+<h1>Hello world!</h1>
+<h3>My hostname is {{ hostname }}</h3>
+
+{% if app_ip %}
+    <h3>Pod url:</h3> {{ app_ip }}
+    <h3>Service url:</h3> {{ svc_ip }}
+    <br/><br/><br/>
+{% endif %}
+
+<div id='links' class="row social">
+    <a class="p-a-xs" href="https://github.com/kave/hello-world"><img src="../static/img/icon-github.svg" alt="github"
+                                                                      height="25" width="25"></a>
+</div>
+<br/>
+
+<button class='button' onclick='myFunction()'>Show request details</button>
+<div id="` + reqInfoID + `" style='display:none'>
+    <h3>Request info</h3>
+    {% for k,v in headers.items() %}
+        <b>{{ k }}:</b> {{ v }}<br/>
+    {% endfor %}
+</div>
+<br/>
+
+<script>
+    function myFunction() {
+        var x = document.getElementById("` + reqInfoID + `");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+</script>
+</body>
+</html>

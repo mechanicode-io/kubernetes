@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: azureinterview-broken-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: azureinterview-broken-app
+  template:
+    metadata:
+      labels:
+        app: azureinterview-broken-app
+    spec:
+      securityContext:
+        runAsNonRoot: true  # Ensure the container doesn't run as root
+        runAsUser: 1337     # Set the user ID to mechanicode's UID
+      containers:
+      - name: azureinterview-broken-container
+        image: 
+        ports:
+        - containerPort: 8080
+        resources:  # Define resource limits and requests
+          limits:
+            cpu: "0.5"  # 0.5 CPU cores
+            memory: "512Mi"  # 512 MB memory
+          requests:
+            cpu: "0.1"  # 0.1 CPU cores
+            memory: "128Mi"  # 128 MB memory
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_UID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.uid
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: azureinterview-broken-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: azureinterview-broken-app
+
+# Why do we need this?
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-reader
+  namespace: mechanicode-go
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-reader-binding
+  namespace: mechanicode-go
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: mechanicode-go
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: azureinterview-broken-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: 
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - test.com # you'll need to change this
+      secretName: azureinterview-broken-tls
+  rules:
+    - host: test.com # you'll need to change this
+      http:
+        paths:
+          - path: /az/go/
+            pathType: Prefix
+            backend:
+              service:
+                name: azureinterview-broken-service
+                port:
+                  number: 80
+          - path: /container-info
+            pathType: Prefix
+            backend:
+              service:
+                name: azureinterview-broken-service
+                port:
+                  number: 80
+          - path: /static/img
+            pathType: Prefix
+            backend:
+              service:
+                name: azureinterview-broken-service
+                port:
+                  number: 80
