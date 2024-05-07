@@ -4,7 +4,7 @@ This repository contains two applications, one written in Go and the other in Py
 
 This is a WIP that we should all contribute to.
 
-# This repo will serve as the primary SOT of how we leverage, deploy and upkeep our kubernetes ecosystems- right now it serves as a basic tutorial to be able to get some apps working and to be able to mess with each part of the SDLC from source to deployment, CICD, etc.
+This repo will serve as the primary SOT of how we leverage, deploy and upkeep our kubernetes ecosystems- right now it serves as a basic tutorial to be able to get some apps working and to be able to mess with each part of the SDLC from source to deployment, CICD, etc.
 
 ## Tools
 ### Files:
