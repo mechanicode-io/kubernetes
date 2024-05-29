@@ -1,8 +1,8 @@
 import os
 import socket
 
-from flask import Flask, request
-from flask import render_template, make_response
+from flask import Flask, request, make_response, redirect, url_for
+from flask import render_template
 
 import config
 
@@ -31,10 +31,11 @@ def hello_world():
                            )
 
 
+# Handle all other paths by returning a generic response
 @app.route("/<string:path>")
 def catch_all(path):
-    print('Failed health check! Update to path /healthz')
-    return make_response({'msg': f'unknown path'}, 500)
+    # Consider a more informative message here
+    return make_response({'msg': 'This is the root path'}, 200)
 
 
 if __name__ == '__main__':

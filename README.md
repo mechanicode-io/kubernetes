@@ -6,6 +6,9 @@ This is a WIP that we should all contribute to.
 
 This repo will serve as the primary SOT of how we leverage, deploy and upkeep our kubernetes ecosystems- right now it serves as a basic tutorial to be able to get some apps working and to be able to mess with each part of the SDLC from source to deployment, CICD, etc.
 
+## AKS Deployment
+This creates a private AKS cluster that's accessible via bastion host.
+
 ## Tools
 ### Files:
 - **populate-helm.sh**: A psuedo sh to populate an existing manifest into a helm chart- there are existing tools out there that do it too but this gives you an idea of what's happening. This script scraped what was in an existing working manifest and converted it into templates for a helm chart.

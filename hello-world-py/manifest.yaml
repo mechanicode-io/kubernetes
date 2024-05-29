@@ -13,30 +13,27 @@ spec:
         app: azureinterview-broken-app
     spec:
       nodeName: hal
-      securityContext:
-        runAsNonRoot: true  # Ensure the container doesn't run as root
-        runAsUser: 1337     # Set the user ID to mechanicode's UID
       containers:
       - name: azureinterview-broken-container
-        image: us-east4-docker.pkg.dev/cloudarchitect-408513/hello-world/azinterview-go
+        image: us-east4-docker.pkg.dev/cloudarchitect-408513/hello-world/azinterview-py
         ports:
-        - containerPort: 8080
-        resources:  # Define resource limits and requests
+        - containerPort: 9000
+        resources:
           limits:
-            cpu: "0.5"  # 0.5 CPU cores
-            memory: "512Mi"  # 512 MB memory
+            cpu: "0.5"
+            memory: "512Mi"
           requests:
-            cpu: "0.1"  # 0.1 CPU cores
-            memory: "128Mi"  # 128 MB memory
+            cpu: "0.1"
+            memory: "128Mi"
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
             path: /healthz
-            port: 8080
+            port: 9000
         readinessProbe:
           httpGet:
             path: /healthz
-            port: 8080
+            port: 9000
         env:
         - name: POD_NAME
           valueFrom:
@@ -52,7 +49,9 @@ spec:
               fieldPath: metadata.uid
       imagePullSecrets:
       - name: regcred
+
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -61,36 +60,11 @@ spec:
   type: ClusterIP
   ports:
   - port: 80
-    targetPort: 8080
+    targetPort: 9000
     protocol: TCP
   selector:
     app: azureinterview-broken-app
 
-# Why do we need this?
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: pod-reader
-  namespace: mechanicode
-rules:
-- apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["get", "list", "watch"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: pod-reader-binding
-  namespace: mechanicode
-subjects:
-- kind: ServiceAccount
-  name: default
-  namespace: mechanicode
-roleRef:
-  kind: Role
-  name: pod-reader
-  apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -99,34 +73,23 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
         - tests.gnomuslabs.com
-      secretName: azureinterview-broken-tls
+      secretName: azureinterview-python-tls
   rules:
     - host: tests.gnomuslabs.com
       http:
         paths:
-          - path: /az/go/
+          - path: /az(/|$)(.*)
             pathType: Prefix
             backend:
               service:
                 name: azureinterview-broken-service
                 port:
                   number: 80
-          - path: /container-info
-            pathType: Prefix
-            backend:
-              service:
-                name: azureinterview-broken-service
-                port:
-                  number: 80
-          - path: /static/img
-            pathType: Prefix
-            backend:
-              service:
-                name: azureinterview-broken-service
-                port:
-                  number: 80
+
+

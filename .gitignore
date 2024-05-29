@@ -1,0 +1,4 @@
+
+aks/.terraform
+aks/.terraform.lock.hcl
+aks/terraform.tfvars

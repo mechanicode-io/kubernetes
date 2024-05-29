@@ -1,0 +1,17 @@
+# Main cloud-config configuration file.
+packages:
+  - curl
+  - apt-transport-https
+  - ca-certificates
+  - gnupg
+  - lsb-release
+  - build-essential
+
+runcmd:
+  - apt-get update
+  - apt-get upgrade -y
+  - sudo -u cloudmin -H curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh | sudo -u cloudmin -H /bin/bash
+  - sudo -u cloudmin -H bash -c 'echo "export PATH=\$PATH:/home/linuxbrew/.linuxbrew/bin" >> /home/cloudmin/.bashrc'
+  - sudo -u cloudmin -H /home/linuxbrew/.linuxbrew/bin/brew install kubectl kubectx k9s'
+  - sudo -u cloudmin -H /home/linuxbrew/.linuxbrew/bin/brew cleanup'
+  - sudo -u cloudmin -H curl -sL https://aka.ms/InstallAzureCLIDeb | sudo -H bash
